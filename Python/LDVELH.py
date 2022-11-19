@@ -52,6 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.creation = QtWidgets.QWidget()
 		self.pop_creation = Ui_pop_creation()
 		self.pop_creation.setupUi(self.creation)
+		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
 		self.creation.show()
 		self.ouvrirPDF()
@@ -69,10 +70,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			x = None
 			self.pop_creation.comboBoxMaitrise.addItem(x)
 		
-		
-
-		
-		index = self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)
+		self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)
 		self.pop_creation.pushButtonEnleverDiscipline.clicked.connect(self.enleverDiscipline)
 
 		listeArmes = getArmes()
@@ -81,53 +79,74 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.pop_creation.pushButtonAjouterArme.clicked.connect(self.ajouterArme)
 		self.pop_creation.pushButtonEnleverArme.clicked.connect(self.enleverArme)
 
-		self.comboBoxPagesSuivantes.addItem('1')
+		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.demarrerNouvellePartie(livre, chapitre, self.dictionnaireNotes))
 
-		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.demarrerNouvellePartie(livre, chapitre, dictionnaireNotes))
 
-		
 	def ajouterArme(self):
 		arme = self.pop_creation.comboBoxArmes.currentText()
 		arme_id = self.pop_creation.comboBoxArmes.currentData()
 		self.pop_creation.comboBoxInventaireArmes.addItem(arme, arme_id)
 	def enleverArme(self):
-		arme = self.pop_creation.comboBoxInventaireArmes.currentText()
+		arme = self.pop_creation.comboBoxInventaireArmes.currentIndex()
 		self.pop_creation.comboBoxInventaireArmes.removeItem(arme)
 
-	def ajouterDiscipline(self)-> int:
-		#self.dictionnaireNotes = {}
+
+	def ajouterDiscipline(self):
+		indexDiscipline = self.pop_creation.comboBoxDisciplines.currentIndex()
 		discipline = self.pop_creation.comboBoxDisciplines.currentText()
 		discipline_id = self.pop_creation.comboBoxDisciplines.currentData()
-		#notes = self.pop_creation.plainTextEditDiscipline.toPlainText()
 		for index in range(5):
 			place = self.pop_creation.comboBoxMaitrise.itemText(index)
 			if place == '':
-				self.pop_creation.comboBoxMaitrise.insertItem(index, discipline, discipline_id)
+				self.pop_creation.comboBoxDisciplines.model().item(indexDiscipline).setEnabled(False)
+				self.pop_creation.comboBoxDisciplines.setCurrentIndex(-1)
+				self.pop_creation.comboBoxMaitrise.setItemData(index, discipline_id)
+				self.pop_creation.comboBoxMaitrise.setItemText(index, discipline)
 				note= self.pop_creation.plainTextEditDiscipline.toPlainText()
-				self.dictionnaireNotes[index] = note
-				#self.pop_creation.plainTextEditDiscipline.clear()
+				self.dictionnaireNotes[discipline_id] = note
+				self.pop_creation.plainTextEditDiscipline.clear()
+				if self.check():
+					self.pop_creation.pushButtonDemarrer.setDisabled(True)
+				else:
+					self.pop_creation.pushButtonDemarrer.setDisabled(False)
 				break
-	
+	def check(self)->bool:
+		vide = 0
+		for x in range(5):
+			texte = self.pop_creation.comboBoxMaitrise.itemText(x)
+			if texte == '':
+				vide =+ 1
+		if vide > 0:
+			return True
 	def enleverDiscipline(self):
 		maitrise = self.pop_creation.comboBoxMaitrise.currentIndex()
-		self.pop_creation.comboBoxMaitrise.insertItem(maitrise, '')
+		discipline_id = self.pop_creation.comboBoxMaitrise.currentData()
+		indexDiscipline = self.pop_creation.comboBoxDisciplines.findData(discipline_id)
+		if discipline_id is not None:
+			self.pop_creation.comboBoxDisciplines.model().item(indexDiscipline).setEnabled(True)
+			self.pop_creation.comboBoxMaitrise.setItemData(maitrise, None)
+			self.pop_creation.comboBoxMaitrise.setItemText(maitrise, '')
+			self.dictionnaireNotes.pop(discipline_id) 
+
 
 	def ajouterObjet(self):
-		
 		nouvelObjet = self.pop_creation.lineEditObjet.text()
 		for x in range(8):
 			place = self.pop_creation.comboBoxInventaire.itemText(x)
 			if place == '':
 				self.pop_creation.comboBoxInventaire.insertItem(x, nouvelObjet)
+				self.pop_creation.lineEditObjet.clear()
 				break
 	def enleverObjet(self):
 		objet = self.pop_creation.comboBoxInventaire.currentIndex()
 		self.pop_creation.comboBoxInventaire.removeItem(objet)
 
+
 	def ouvrirPDF(self):
 		path = 'Loup-solitaire-01-les-maitres-des-tenebres.pdf'
-		webbrowser.open_new(path)
+		#webbrowser.open_new(path)
 	
+
 	def demarrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
@@ -144,13 +163,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		insertInventaire(personnage_id, nom_personnage, objet[0], objet[1], objet[2], objet[3], objet[4], objet[5], objet[6], objet[7])
 
 		for x in range(5):
-			notes = dictionnaireNotes[x]
-			discipline_id = self.pop_creation.comboBoxMaitrise.currentData(x)
+			discipline_id = self.pop_creation.comboBoxMaitrise.itemData(x)
+			notes = dictionnaireNotes[discipline_id]
 			insertMaitrise(discipline_id, personnage_id, notes)
 		
 		for x in range(2):
-			arme_id = self.pop_creation.comboBoxInventaireArmes.currectData()
-			insertInventaireArme(arme_id, personnage_id)
+			if self.pop_creation.comboBoxInventaireArmes.itemText(x):
+				arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(x)
+				insertInventaireArme(arme_id, personnage_id)
 		
 		self.partie(livre, chapitre)
 

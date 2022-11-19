@@ -370,6 +370,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonDemarrer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>440</x>

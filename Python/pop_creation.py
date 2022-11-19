@@ -115,6 +115,7 @@ class Ui_pop_creation(object):
         self.labelNomPersonnage.setGeometry(QtCore.QRect(20, 400, 101, 21))
         self.labelNomPersonnage.setObjectName("labelNomPersonnage")
         self.pushButtonDemarrer = QtWidgets.QPushButton(pop_creation)
+        self.pushButtonDemarrer.setEnabled(False)
         self.pushButtonDemarrer.setGeometry(QtCore.QRect(440, 400, 75, 23))
         self.pushButtonDemarrer.setObjectName("pushButtonDemarrer")
         self.pushButtonAjouterSac = QtWidgets.QPushButton(pop_creation)
