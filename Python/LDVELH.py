@@ -67,7 +67,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		for x in range(5):
 			x = None
 			self.pop_creation.comboBoxMaitrise.addItem(x)
-		self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)
+		dictionnaireNotes = {}
+		dictionnaireNotes[self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)] = self.pop_creation.plainTextEditDiscipline.toPlainText()
 		self.pop_creation.pushButtonEnleverDiscipline.clicked.connect(self.enleverDiscipline)
 
 		listeArmes = getArmes()
@@ -78,7 +79,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 		self.comboBoxPagesSuivantes.addItem('1')
 
-		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.demarrerNouvellePartie(livre, chapitre))
+		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.demarrerNouvellePartie(livre, chapitre, dictionnaireNotes))
 
 		
 	def ajouterArme(self):
@@ -89,14 +90,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		arme = self.pop_creation.comboBoxInventaireArmes.current()
 		self.pop_creation.comboBoxInventaireArmes.removeItem(arme)
 
-	def ajouterDiscipline(self):
+	def ajouterDiscipline(self)-> int:
 		discipline = self.pop_creation.comboBoxDisciplines.currentText()
 		discipline_id = self.pop_creation.comboBoxDisciplines.currentData()
-		for x in range(5):
-			place = self.pop_creation.comboBoxMaitrise.itemText(x)
+		for index in range(5):
+			place = self.pop_creation.comboBoxMaitrise.itemText(index)
 			if place == '':
-				self.pop_creation.comboBoxMaitrise.insertItem(x, discipline, discipline_id)
-				break
+				self.pop_creation.comboBoxMaitrise.insertItem(index, discipline, discipline_id)
+				return index
 
 	def enleverDiscipline(self):
 		maitrise = self.pop_creation.comboBoxMaitrise.currentIndex()
@@ -118,7 +119,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		path = 'Loup-solitaire-01-les-maitres-des-tenebres.pdf'
 		webbrowser.open_new(path)
 	
-	def demarrerNouvellePartie(self, livre, chapitre):
+	def demarrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
 		endurance = self.pop_creation.spinBoxEndurance.value()
@@ -134,8 +135,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		insertInventaire(personnage_id, nom_personnage, objet[0], objet[1], objet[2], objet[3], objet[4], objet[5], objet[6], objet[7])
 
 		for x in range(5):
+			notes = dictionnaireNotes[x]
 			discipline_id = self.pop_creation.comboBoxMaitrise.currentData(x)
-			insertMaitrise(discipline_id, personnage_id)
+			insertMaitrise(discipline_id, personnage_id, notes)
 		
 		for x in range(2):
 			arme_id = self.pop_creation.comboBoxInventaireArmes.currectData()
