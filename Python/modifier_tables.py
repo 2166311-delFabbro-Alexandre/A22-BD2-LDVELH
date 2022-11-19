@@ -12,6 +12,48 @@ db_config = {
 	'collation': 'utf8mb4_general_ci'
 }
 
+
+def insertPersonnage(nom_personnage: str, habilete: int, endurance: int, endurance_max: int, bourse: int, objets_speciaux: str)-> int:
+    """
+    Ajoute un personnage à sa création
+    Args:
+        nom_personnage (str): nom du personnage    
+        habilete (int): habilete
+        endurance (int): endurance
+        endurance_max (int): endurance fixe
+        bourse (int): total pièces d'or
+        objets_speciaux (text): texte des objets spéciaux
+
+    Returns:
+        personnageId: le id de la feuille d'aventure
+    """
+    query = """
+        INSERT INTO feuille_aventure (nom_personnage, habilete, endurance, endurance_max, bourse, objets_speciaux)
+        VALUES(%(nom_personnage)s, %(habilete)s, %(endurance)s, %(endurance_max)s, %(bourse)s, %(objets_speciaux)s);
+    """
+    parametres = {
+        'nom_personnage' : nom_personnage,
+        'habilete' : habilete,
+        'endurance' : endurance,
+        'endurance_max' : endurance_max,
+        'bourse' : bourse,
+        'objets_speciaux' : objets_speciaux,
+    }
+    try:
+        connection = mysql.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute(query, parametres)
+        personnageId = cursor.lastrowid
+
+        connection.commit()
+    except mysql.Error as erreur:
+        print(erreur)
+    finally:
+        cursor.close()
+        connection.close()
+
+    return personnageId
+
 def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2: str, objet3: str, objet4: str, objet5: str, objet6: str, objet7: str, objet8: str):
     """
     Ajoute un inventaire à la création
@@ -32,10 +74,11 @@ def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2
         inventaire_id: le id de l'inventaire créé (int)
     """
     query = """
-        INSERT INTO inventaire (nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8)
-        VALUES(%(nom_personnage)s, %(objet1)s, %(objet2)s, %(objet3)s, %(objet4)s, %(objet5)s, %(objet6)s, %(objet7)s, %(objet8)s,);
+        INSERT INTO inventaire (personnage_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8)
+        VALUES(%(personnage_id)s, %(nom_personnage)s, %(objet1)s, %(objet2)s, %(objet3)s, %(objet4)s, %(objet5)s, %(objet6)s, %(objet7)s, %(objet8)s,);
     """
     parametres = {
+        'personnage_id' : personnage_id,
         'nom_personnage' : nom_personnage,
         'objet1' : objet1,
         'objet2' : objet2,
@@ -58,48 +101,6 @@ def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2
     finally:
         cursor.close()
         connection.close()
-
-
-def insertPersonnage(nom: str, habilete: int, endurance: int, endurance_max: int, bourse: int, objets_speciaux: str)-> bool:
-    """
-    Ajoute un personnage à sa création
-    Args:
-        nom (str): nom du personnage    
-        habilete (int): habilete
-        endurance (int): endurance
-        endurance_max (int): endurance fixe
-        bourse (int): total pièces d'or
-        objets_speciaux (text): texte des objets spéciaux
-
-    Returns:
-        personnageId: le id de la feuille d'aventure
-    """
-    query = """
-        INSERT INTO feuille_aventure (nom_personnage, habilete, endurance, endurance_max, bourse, objets_speciaux)
-        VALUES(%(nom)s, %(habilete)s, %(endurance)s, %(endurance_max)s, %(bourse)s, %(objets_speciaux)s);
-    """
-    parametres = {
-        'nom_personnage' : nom,
-        'habilete' : habilete,
-        'endurance' : endurance,
-        'endurance_max' : endurance_max,
-        'bourse' : bourse,
-        'objets_speciaux' : objets_speciaux,
-    }
-    try:
-        connection = mysql.connect(**db_config)
-        cursor = connection.cursor()
-        cursor.execute(query, parametres)
-        personnageId = cursor.lastrowid
-
-        connection.commit()
-    except mysql.Error as erreur:
-        print(erreur)
-    finally:
-        cursor.close()
-        connection.close()
-
-    return personnageId
 
 def insertMaitrise(discipline_id: int, personnage_id: int, notes: str):
     """

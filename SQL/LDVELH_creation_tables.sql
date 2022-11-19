@@ -21,7 +21,7 @@ create table if not exists ldvelh.chapitre (
 
 create table if not exists ldvelh.lien_chapitre (
 	id INT auto_increment NOT NULL,
-	livre_id INT NOT NULL
+	livre_id INT NOT NULL,
 	no_chapitre_origine INT NOT NULL,
 	no_chapitre_destination INT NOT NULL,
 	CONSTRAINT lien_chapitre_pk PRIMARY KEY (id),

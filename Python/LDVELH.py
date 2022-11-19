@@ -1,4 +1,3 @@
-
 import sys
 #https://blog.finxter.com/how-to-open-a-pdf-file-in-python/#:~:text=Popen()%20%E2%80%94%20Without%20CMD,PDF%20directly%20in%20the%20viewer.
 import webbrowser
@@ -23,10 +22,12 @@ from pop_creation import Ui_pop_creation
 from interface import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
+
 	def __init__(self, *args, obj=None, **kwargs):
 		super(MainWindow, self).__init__(*args, **kwargs)
 		self.debuterPartie()
 		self.setupUi(self)
+		self.dictionnaireNotes = {}
 
 	#https://www.youtube.com/watch?v=17xE-8UlV_Y (Sajanraj T D)
 	def debuterPartie(self):
@@ -67,8 +68,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		for x in range(5):
 			x = None
 			self.pop_creation.comboBoxMaitrise.addItem(x)
-		dictionnaireNotes = {}
-		dictionnaireNotes[self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)] = self.pop_creation.plainTextEditDiscipline.toPlainText()
+		
+		
+
+		
+		index = self.pop_creation.pushButtonAjouterDiscipline.clicked.connect(self.ajouterDiscipline)
 		self.pop_creation.pushButtonEnleverDiscipline.clicked.connect(self.enleverDiscipline)
 
 		listeArmes = getArmes()
@@ -87,21 +91,26 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		arme_id = self.pop_creation.comboBoxArmes.currentData()
 		self.pop_creation.comboBoxInventaireArmes.addItem(arme, arme_id)
 	def enleverArme(self):
-		arme = self.pop_creation.comboBoxInventaireArmes.current()
+		arme = self.pop_creation.comboBoxInventaireArmes.currentText()
 		self.pop_creation.comboBoxInventaireArmes.removeItem(arme)
 
 	def ajouterDiscipline(self)-> int:
+		#self.dictionnaireNotes = {}
 		discipline = self.pop_creation.comboBoxDisciplines.currentText()
 		discipline_id = self.pop_creation.comboBoxDisciplines.currentData()
+		#notes = self.pop_creation.plainTextEditDiscipline.toPlainText()
 		for index in range(5):
 			place = self.pop_creation.comboBoxMaitrise.itemText(index)
 			if place == '':
 				self.pop_creation.comboBoxMaitrise.insertItem(index, discipline, discipline_id)
-				return index
-
+				note= self.pop_creation.plainTextEditDiscipline.toPlainText()
+				self.dictionnaireNotes[index] = note
+				#self.pop_creation.plainTextEditDiscipline.clear()
+				break
+	
 	def enleverDiscipline(self):
 		maitrise = self.pop_creation.comboBoxMaitrise.currentIndex()
-		self.pop_creation.comboBoxMaitrise.removeItem(maitrise)
+		self.pop_creation.comboBoxMaitrise.insertItem(maitrise, '')
 
 	def ajouterObjet(self):
 		
