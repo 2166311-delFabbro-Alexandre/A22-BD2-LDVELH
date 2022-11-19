@@ -1,0 +1,23 @@
+LDVELH
+
+Choses à faire:
+
+-CHECKER GRILLE DE CORRECTION + STICK TO IT
+-connecter text avec chapitre
+-créer table sauvegarde - done (manque peut-être constraint 4 saves max)
+-insertions de données (armes, disciplines kaï, objets?...)
+-sac à dos 8 objets max - obj spéciaux pas dans sac à dos! - modif creation tables
+-revoir insertion_discipline quand GUI fait
+-erreurs de connection mysql?
+-procédure pour les livres?
+
+Questions:
+
+-user pour multi hosts?
+-user uniquement pour localhost?
+-est-ce que le fichier des tables doit être lancé avant?
+-comment passer un criss de script direct dans devilbox
+
+Done:
+
+-database settée
