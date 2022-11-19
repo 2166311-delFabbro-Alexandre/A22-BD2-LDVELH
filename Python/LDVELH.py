@@ -7,13 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-
-from get_livres import getLivres
-from get_saves import getSaves
-from get_chapitre import getChapitre
-from get_armes import getArmes
-from get_disciplines import getDisciplines
-from get_liens import getLiens
+from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
 from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme
 
 

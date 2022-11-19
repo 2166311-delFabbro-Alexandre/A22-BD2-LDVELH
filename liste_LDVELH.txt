@@ -4,19 +4,13 @@ Choses à faire:
 
 -CHECKER GRILLE DE CORRECTION + STICK TO IT
 -créer table sauvegarde - done (manque peut-être constraint 4 saves max)
--insertions de données (armes, disciplines kaï, objets?...)
--sac à dos 8 objets max - obj spéciaux pas dans sac à dos! - modif creation tables
--revoir insertion_discipline quand GUI fait
--changer repas dans table feuille_aventure
--ajouter numéro livre dans get_liens
--enlever usager_id
+-get toutes infos de la db pour écran principal
+-insert toutes infos dans db
+-tabs combat et inventaire?
+-esthétique
 
 Questions:
 
--user pour multi hosts?
--user uniquement pour localhost?
--est-ce que le fichier des tables doit être lancé avant?
--comment passer un criss de script direct dans devilbox
 
 Done:
 
