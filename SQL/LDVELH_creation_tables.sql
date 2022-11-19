@@ -28,34 +28,31 @@ create table if not exists ldvelh.lien_chapitre (
 	CONSTRAINT lien_chapitre_FK FOREIGN KEY (livre_id) REFERENCES ldvelh.livre(id)
 );
 
-create table if not exists ldvelh.inventaire (
-	id INT auto_increment NOT NULL,
-	feuille_aventure_id INT NOT NULL,
-	nom_personnage varchar(30) NOT NULL,
-	objet1 varchar(20) NOT NULL,
-	objet2 varchar(20) NOT NULL,
-	objet3 varchar(20) NOT NULL,
-	objet4 varchar(20) NOT NULL,
-	objet5 varchar(20) NOT NULL,
-	objet6 varchar(20) NOT NULL,
-	objet7 varchar(20) NOT NULL,
-	objet8 varchar(20) NOT NULL,
-	CONSTRAINT inventaire_pk PRIMARY KEY (id)
-);
-	
-	
 create table if not exists ldvelh.feuille_aventure (
 	id INT auto_increment NOT NULL,
-	usager_id INT NOT NULL,
 	nom_personnage varchar(30) NOT NULL,
 	habilete INT NOT NULL,
 	endurance INT NOT NULL,
 	endurance_max INT NOT NULL,
 	bourse INT NOT NULL,
-	inventaire_id INT NOT NULL,
 	objets_speciaux TEXT,
-	CONSTRAINT feuille_aventure_pk PRIMARY KEY (id),
-	CONSTRAINT feuille_aventure_fk FOREIGN KEY (inventaire_id) REFERENCES ldvelh.inventaire(id)
+	CONSTRAINT feuille_aventure_pk PRIMARY KEY (id)
+);
+
+create table if not exists ldvelh.inventaire (
+	id INT auto_increment NOT NULL,
+	feuille_aventure_id INT NOT NULL,
+	nom_personnage varchar(30) NOT NULL,
+	objet1 varchar(20),
+	objet2 varchar(20),
+	objet3 varchar(20),
+	objet4 varchar(20),
+	objet5 varchar(20),
+	objet6 varchar(20),
+	objet7 varchar(20),
+	objet8 varchar(20),
+	CONSTRAINT inventaire_pk PRIMARY KEY (id),
+	CONSTRAINT inventaire_fk FOREIGN KEY (feuille_aventure_ID) REFERENCES ldvelh.feuille_aventure(id)
 );
 
 create table if not exists ldvelh.discipline_kai (
@@ -85,7 +82,6 @@ create table if not exists ldvelh.inventaire_arme (
 	id INT auto_increment NOT NULL,
 	arme_id INT NOT NULL,
 	personnage_id INT NOT NULL,
-	maitrise_arme TINYINT NOT NULL DEFAULT 0,
 	CONSTRAINT inventaire_arme_pk PRIMARY KEY (id),
 	CONSTRAINT inventaire_arme_FK FOREIGN KEY (arme_id) REFERENCES ldvelh.arme(id),
 	CONSTRAINT inventaire_arme_FK2 FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id)

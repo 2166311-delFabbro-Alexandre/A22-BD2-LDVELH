@@ -12,11 +12,12 @@ db_config = {
 	'collation': 'utf8mb4_general_ci'
 }
 
-def insertInventaire(nom_personnage:str, objet1: str, objet2: str, objet3: str, objet4: str, objet5: str, objet6: str, objet7: str, objet8: str)-> bool:
+def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2: str, objet3: str, objet4: str, objet5: str, objet6: str, objet7: str, objet8: str):
     """
     Ajoute un inventaire à la création
 
     Args:
+        personnage_id (int): id de la feuille d'aventure
         nom_personnage (str): nom du personnage à qui l'inventaire appartient
         objet1 (str): objet 1
         objet2 (str): objet 2
@@ -58,9 +59,8 @@ def insertInventaire(nom_personnage:str, objet1: str, objet2: str, objet3: str, 
         cursor.close()
         connection.close()
 
-    return inventaireId
 
-def insertPersonnage(nom: str, habilete: int, endurance: int, endurance_max: int, bourse: int, inventaire_id: int, objets_speciaux: str)-> bool:
+def insertPersonnage(nom: str, habilete: int, endurance: int, endurance_max: int, bourse: int, objets_speciaux: str)-> bool:
     """
     Ajoute un personnage à sa création
     Args:
@@ -69,15 +69,14 @@ def insertPersonnage(nom: str, habilete: int, endurance: int, endurance_max: int
         endurance (int): endurance
         endurance_max (int): endurance fixe
         bourse (int): total pièces d'or
-        inventaire_id (int): id de l'inventaire du personnage
         objets_speciaux (text): texte des objets spéciaux
 
     Returns:
         personnageId: le id de la feuille d'aventure
     """
     query = """
-        INSERT INTO feuille_aventure (nom_personnage, habilete, endurance, endurance_max, bourse, inventaire_id, objets_speciaux)
-        VALUES(%(nom)s, %(habilete)s, %(endurance)s, %(endurance_max)s, %(bourse)s, %(inventaire_id)s, %(objets_speciaux)s);
+        INSERT INTO feuille_aventure (nom_personnage, habilete, endurance, endurance_max, bourse, objets_speciaux)
+        VALUES(%(nom)s, %(habilete)s, %(endurance)s, %(endurance_max)s, %(bourse)s, %(objets_speciaux)s);
     """
     parametres = {
         'nom_personnage' : nom,
@@ -85,7 +84,6 @@ def insertPersonnage(nom: str, habilete: int, endurance: int, endurance_max: int
         'endurance' : endurance,
         'endurance_max' : endurance_max,
         'bourse' : bourse,
-        'inventaire_id' : inventaire_id,
         'objets_speciaux' : objets_speciaux,
     }
     try:
