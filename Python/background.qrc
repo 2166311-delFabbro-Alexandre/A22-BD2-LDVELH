@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="tab">
+    <file>feuille_aventure.png</file>
+  </qresource>
+</RCC>

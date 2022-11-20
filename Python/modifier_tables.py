@@ -147,7 +147,7 @@ def insertInventaireArme(arme_id: int, personnage_id: int):
         VALUES(%(arme_id)s, %(personnage_id)s);
     """
     parametres = {
-        'discipline_id' : arme_id,
+        'arme_id' : arme_id,
         'personnage_id' : personnage_id,
     }
     try:

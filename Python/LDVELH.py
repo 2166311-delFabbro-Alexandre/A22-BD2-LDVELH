@@ -9,7 +9,7 @@ from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
 from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme
-from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises
+from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire
 
 
 from pop_up import Ui_pop_up
@@ -44,9 +44,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 	def popUpNouvellePartie(self):
 		livre = self.pop_up.comboBoxLivre.currentIndex() + 1
 		chapitre = 'Avertir le roi'
-		#self.creation = QtWidgets.QWidget()
-		#self.pop_creation = Ui_pop_creation()
-		#self.pop_creation.setupUi(self.creation)
+		self.creation = QtWidgets.QWidget()
+		self.pop_creation = Ui_pop_creation()
+		self.pop_creation.setupUi(self.creation)
 		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
 		#self.creation.show()
@@ -165,15 +165,27 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			notes = dictionnaireNotes[discipline_id]
 			insertMaitrise(discipline_id, personnage_id, notes)
 		
-		for x in range(2):
-			if self.pop_creation.comboBoxInventaireArmes.itemText(x):
-				arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(x)
-				insertInventaireArme(arme_id, personnage_id)
+		for arme in range(self.pop_creation.comboBoxInventaireArmes.count()):
+			arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(arme)
+			insertInventaireArme(arme_id, personnage_id)
 		
 		self.partie(livre, chapitre, personnage_id)
 
 
 	def partie(self, livre, chapitre, personnage_id):
+
+		self.listeLabelsDisciplines = [
+			'self.labelDiscipline1',
+			'self.labelDiscipline2',
+			'self.labelDiscipline3',
+			'self.labelDiscipline4',
+			'self.labelDiscipline5',
+		]
+
+		self.listeLabelsArmes =  [
+			'self.labelArme1',
+			'self,labelArme2'
+		]
 
 		page = getChapitre(livre, chapitre)
 		no_chapitre, texte = page
@@ -185,30 +197,33 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.labelNomFeuille.setText(nom_personnage)
 		self.spinBoxHabilete.setValue(habilete)
 		self.spinBoxHabileteLivre.setValue(habilete)
+		self.spinBoxEndurance.setValue(endurance)
 		self.progressBarEndurance.setValue(endurance)
 		self.progressBarEndurance.setMaximum(endurance_max)
 		self.spinBoxBourse.setValue(bourse)
 		self.textBrowserObjetsSpeciaux.setPlainText(objets_speciaux)
-
+	
 		maitrises = getMaitrises(personnage_id)
-		id_maitrise, nom_discipline, notes = maitrises
-		for discipline in maitrises:
-			index = 1
-			labelDis = self.labelDiscipline1()
-			self.labelIter.setText(nom_discipline)
-			index += 1
+		#https://www.youtube.com/watch?v=bkqjXE_NTbU ->  Jie Jenn "How to iterate child widgets | PyQt6 Tutorial"
+		for x in range(self.layoutDisciplines.count()):
+			discipline = maitrises[x]
+			maitrise_id, nom_discipline, maitrise_notes = discipline
+			self.layoutDisciplines.itemAt(x).widget().setText(nom_discipline)
+			self.layoutDisciplines.itemAt(x).widget().setToolTip(maitrise_notes)
+			
+
 		inventaireArmes = getInventaireArmes(personnage_id)
-
-		
-
-		
-		
-		id_maitrise, nom_discipline, notes = maitrises
-		id, nom_arme = inventaireArmes
+		for x in range(self.layoutArmes.count()):
+			arme = inventaireArmes[x]
+			id_arme, nom_arme = arme
+			self.layoutArmes.itemAt(x).widget().setText(nom_arme)
 
 
-		
-		self.labelDiscipline1.setText()
+		# inventaireObjets = getInventaire(personnage_id)
+		# id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 = inventaireObjets
+		# for objet in range(8):
+		# 	self.listWidgetInventaire.addItem(objet + "%o" % objet)
+
 		window.show()
 
 		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))

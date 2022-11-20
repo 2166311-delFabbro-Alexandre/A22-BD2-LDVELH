@@ -56,7 +56,7 @@ def getMaitrises(personnage_id: int)-> list:
 
 	query = """
 		SELECT mk.id, dk.nom_discipline, mk.notes FROM maitrise_kai mk
-		INNER JOIN discipline_kai dk ON mk.discipline_id = dk.id
+		INNER JOIN discipline_kai dk ON dk.id = mk.discipline_id
         WHERE mk.personnage_id = %(personnage_id)s;
 	"""
 
@@ -102,6 +102,38 @@ def getInventaireArmes(personnage_id: int)-> list:
 		cursor = connection.cursor()
 		cursor.execute(query, parametres)
 		result = cursor.fetchall()
+	except mysql.Error as erreur:
+		print(erreur)
+	finally:
+		cursor.close()
+		connection.close()
+		
+	return result
+
+#Select l'inventaire
+def getInventaire(personnage_id: int)-> list:
+	"""
+	Sélectionne l'inventaire du personnage'
+    Arguments:
+		personnage_id: le id du personnage
+	Returns:
+		Un tuple avec l'id de l'inventaire, le id de la feuille d'aventure, le nom du personnage, les objets 1 à 8
+	"""
+
+	query = """
+		SELECT id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 FROM inventaire
+        WHERE id = %(personnage_id)s;
+	"""
+
+	parametres = {
+		'personnage_id' : personnage_id,
+	}
+	
+	try:
+		connection = mysql.connect(**db_config)
+		cursor = connection.cursor()
+		cursor.execute(query, parametres)
+		result = cursor.fetchone()
 	except mysql.Error as erreur:
 		print(erreur)
 	finally:

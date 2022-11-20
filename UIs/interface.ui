@@ -21,7 +21,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -74,7 +74,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="format">
-                  <string>%p/%m</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -209,7 +209,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../feuille_aventure.qrc">:/feuille_aventure/UIs/feuille_aventure.png</pixmap>
+         <pixmap resource="../Python/background.qrc">:/tab/feuille_aventure.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -271,7 +271,7 @@ p, li { white-space: pre-wrap; }
           <height>71</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <layout class="QVBoxLayout" name="layoutArmes">
          <item>
           <widget class="QLabel" name="labelArme1">
            <property name="text">
@@ -283,25 +283,6 @@ p, li { white-space: pre-wrap; }
           <widget class="QLabel" name="labelArme2">
            <property name="text">
             <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="verticalLayoutWidget_4">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>530</y>
-          <width>321</width>
-          <height>91</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <widget class="QListView" name="listViewObjets">
-           <property name="autoFillBackground">
-            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -386,8 +367,17 @@ p, li { white-space: pre-wrap; }
           <underline>true</underline>
          </font>
         </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
         <property name="text">
          <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
        <widget class="QTextBrowser" name="textBrowserObjetsSpeciaux">
@@ -400,6 +390,16 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
        </widget>
+       <widget class="QListWidget" name="listWidgetInventaire">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>530</y>
+          <width>321</width>
+          <height>91</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -407,7 +407,7 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <resources>
-  <include location="../feuille_aventure.qrc"/>
+  <include location="../Python/background.qrc"/>
  </resources>
  <connections/>
 </ui>
