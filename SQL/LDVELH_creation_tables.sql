@@ -52,7 +52,7 @@ create table if not exists ldvelh.inventaire (
 	objet7 varchar(20),
 	objet8 varchar(20),
 	CONSTRAINT inventaire_pk PRIMARY KEY (id),
-	CONSTRAINT inventaire_fk FOREIGN KEY (feuille_aventure_ID) REFERENCES ldvelh.feuille_aventure(id)
+	CONSTRAINT inventaire_fk FOREIGN KEY (feuille_aventure_id) REFERENCES ldvelh.feuille_aventure(id)
 );
 
 create table if not exists ldvelh.discipline_kai (

@@ -122,11 +122,11 @@ def getInventaire(personnage_id: int)-> list:
 
 	query = """
 		SELECT id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 FROM inventaire
-        WHERE id = %(personnage_id)s;
+        WHERE feuille_aventure_id = %(feuille_aventure_id)s;
 	"""
 
 	parametres = {
-		'personnage_id' : personnage_id,
+		'feuille_aventure_id' : personnage_id,
 	}
 	
 	try:

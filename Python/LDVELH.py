@@ -213,16 +213,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			
 
 		inventaireArmes = getInventaireArmes(personnage_id)
-		for x in range(self.layoutArmes.count()):
+		for x in range(len(inventaireArmes)):
 			arme = inventaireArmes[x]
 			id_arme, nom_arme = arme
 			self.layoutArmes.itemAt(x).widget().setText(nom_arme)
 
 
-		# inventaireObjets = getInventaire(personnage_id)
-		# id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 = inventaireObjets
-		# for objet in range(8):
-		# 	self.listWidgetInventaire.addItem(objet + "%o" % objet)
+		inventaireObjets = getInventaire(personnage_id)
+		id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 = inventaireObjets
+		for objet in range(8):
+			if inventaireObjets[(objet + 3)].lower() == 'repas':
+				value = self.spinBoxRepas.value()
+				self.spinBoxRepas.setValue(value+1)
+			else: 
+				self.listWidgetInventaire.addItem(inventaireObjets[(objet + 3)])
 
 		window.show()
 

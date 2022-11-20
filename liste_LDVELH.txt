@@ -7,7 +7,18 @@ Choses à faire:
 -get toutes infos de la db pour écran principal
 -insert toutes infos dans db
 -tabs combat et inventaire?
--esthétique
+-esthétique:
+ -spinbox endurance (max en mortaise?) (couleur?)
+ -radio pour pages
+ -Edit pour Habilete?
+-changer feuille_aventure_id table inventaire
+
+-Select aventure:
+ -feuille d'aventure
+ -liste objet
+ -liste maitrises
+ -armes
+ 
 
 Questions:
 
