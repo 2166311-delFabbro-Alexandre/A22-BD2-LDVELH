@@ -48,8 +48,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.pop_creation.setupUi(self.creation)
 		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
-		self.creation.show()
-		self.ouvrirPDF()
+		#self.creation.show()
+		self.partie(livre,chapitre)
+		#self.ouvrirPDF()
 
 		for x in range(8):
 			x = None
@@ -92,7 +93,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		for index in range(5):
 			place = self.pop_creation.comboBoxMaitrise.itemText(index)
 			if place == '':
-				self.pop_creation.comboBoxDisciplines.model().item(indexDiscipline).setEnabled(False)
+				if indexDiscipline > -1:
+					self.pop_creation.comboBoxDisciplines.model().item(indexDiscipline).setEnabled(False)
 				self.pop_creation.comboBoxDisciplines.setCurrentIndex(-1)
 				self.pop_creation.comboBoxMaitrise.setItemData(index, discipline_id)
 				self.pop_creation.comboBoxMaitrise.setItemText(index, discipline)
@@ -138,10 +140,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 	def ouvrirPDF(self):
 		path = 'Loup-solitaire-01-les-maitres-des-tenebres.pdf'
-		#webbrowser.open_new(path)
+		webbrowser.open_new(path)
 	
 
 	def demarrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
+		self.creation.close()
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
 		endurance = self.pop_creation.spinBoxEndurance.value()
@@ -177,6 +180,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		window.show()
 
 		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))
+		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
+		self.pushQuitter.clicked.connect(sys.exit)
 	
 	def tournerPage(self, livre):
 		
