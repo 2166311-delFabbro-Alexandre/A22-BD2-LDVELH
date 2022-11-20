@@ -9,6 +9,7 @@ from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
 from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme
+from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises
 
 
 from pop_up import Ui_pop_up
@@ -43,13 +44,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 	def popUpNouvellePartie(self):
 		livre = self.pop_up.comboBoxLivre.currentIndex() + 1
 		chapitre = 'Avertir le roi'
-		self.creation = QtWidgets.QWidget()
-		self.pop_creation = Ui_pop_creation()
-		self.pop_creation.setupUi(self.creation)
+		#self.creation = QtWidgets.QWidget()
+		#self.pop_creation = Ui_pop_creation()
+		#self.pop_creation.setupUi(self.creation)
 		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
 		#self.creation.show()
-		self.partie(livre,chapitre)
+		self.partie(livre,chapitre, 27)
 		#self.ouvrirPDF()
 
 		for x in range(8):
@@ -169,14 +170,45 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 				arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(x)
 				insertInventaireArme(arme_id, personnage_id)
 		
-		self.partie(livre, chapitre)
+		self.partie(livre, chapitre, personnage_id)
 
 
-	def partie(self, livre, chapitre):
+	def partie(self, livre, chapitre, personnage_id):
+
 		page = getChapitre(livre, chapitre)
 		no_chapitre, texte = page
 		self.textBrowser.setText(texte)
 		self.labelChapitre.setText("Chapitre " + no_chapitre)
+
+		personnage = getFeuilleAventure(personnage_id)
+		nom_personnage, habilete, endurance, endurance_max, bourse, objets_speciaux = personnage
+		self.labelNomFeuille.setText(nom_personnage)
+		self.spinBoxHabilete.setValue(habilete)
+		self.spinBoxHabileteLivre.setValue(habilete)
+		self.progressBarEndurance.setValue(endurance)
+		self.progressBarEndurance.setMaximum(endurance_max)
+		self.spinBoxBourse.setValue(bourse)
+		self.textBrowserObjetsSpeciaux.setPlainText(objets_speciaux)
+
+		maitrises = getMaitrises(personnage_id)
+		id_maitrise, nom_discipline, notes = maitrises
+		for discipline in maitrises:
+			index = 1
+			labelDis = self.labelDiscipline1()
+			self.labelIter.setText(nom_discipline)
+			index += 1
+		inventaireArmes = getInventaireArmes(personnage_id)
+
+		
+
+		
+		
+		id_maitrise, nom_discipline, notes = maitrises
+		id, nom_arme = inventaireArmes
+
+
+		
+		self.labelDiscipline1.setText()
 		window.show()
 
 		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))

@@ -45,7 +45,7 @@ def getFeuilleAventure(personnage_id: int)-> tuple:
 	return result
 
 #Select les maitrises kai
-def getMaitriser(personnage_id: int)-> list:
+def getMaitrises(personnage_id: int)-> list:
 	"""
 	Sélectionne les maitrises du personnage
     Arguments:
@@ -90,7 +90,7 @@ def getInventaireArmes(personnage_id: int)-> list:
 	query = """
 		SELECT ia.id, a.nom_arme FROM inventaire_arme ia
 		INNER JOIN arme a ON ia.arme_id = a.id
-        WHERE mk.personnage_id = %(personnage_id)s;
+        WHERE ia.personnage_id = %(personnage_id)s;
 	"""
 
 	parametres = {
