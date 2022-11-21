@@ -70,11 +70,11 @@ def getChapitre(no_livre: int, no_chapitre: int)-> tuple:
 		no_livre: le numéro du livre (int)
 		no_chapitre: le numéro du chapitre (str)
 	Returns:
-		Un tuple avec le numéro du chapitre (int) et le texte (text)
+		Un tuple avec le id du chapitre, le numéro du chapitre (int) et le texte (text)
 	"""
 	
 	query = """
-		SELECT no_chapitre, texte FROM chapitre c
+		SELECT id, no_chapitre, texte FROM chapitre c
 		WHERE c.livre_id = %(no_livre)s AND c.no_chapitre = %(no_chapitre)s;
 	"""
 	parametres = {
@@ -162,7 +162,7 @@ def getSaves()-> tuple:
 	"""
 	
 	query = """
-		SELECT nom_personnage, date_sauvegarde FROM feuille_aventure
+		SELECT concat(nom_personnage, " ", date_sauvegarde) FROM feuille_aventure
         INNER JOIN sauvegarde ON personnage_id = feuille_aventure.id;
 	"""
 	try:

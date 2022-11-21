@@ -4,10 +4,7 @@ Choses à faire:
 
 -CHECKER GRILLE DE CORRECTION + STICK TO IT
 
--lineedit pour sac à dos
--repas ajoute ou enleve objet
--enlever textlabel armes
--trigger 8 objets max - repas
+
 -setter démarrer partie sauvegardée
 
 

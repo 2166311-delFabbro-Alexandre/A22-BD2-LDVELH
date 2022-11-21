@@ -8,7 +8,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
-from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme
+from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde
 from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire
 
 
@@ -36,10 +36,37 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		for sauvegarde in tuple_saves:
 			self.pop_up.comboBoxSave.addItems(sauvegarde)
 		self.pop_up.boutonQuitter.clicked.connect(sys.exit)
-		self.pop_up.boutonNouvellePartie.clicked.connect(self.popUpNouvellePartie)
+		nombreSaves = self.pop_up.comboBoxSave.count()
+		self.pop_up.boutonNouvellePartie.clicked.connect(lambda: self.departJeu(nombreSaves))
+		# if self.pop_up.comboBoxSave.count() < 4:
+		# 	self.pop_up.boutonNouvellePartie.clicked.connect(self.departJeu)
+		# if self.pop_up.comboBoxSave.count() == 4:
+		# 	msg = QMessageBox()
+		# 	msg.setIcon(QMessageBox.Information)
+		# 	msg.setText("This is a message box")
+		# 	msg.setInformativeText("This is additional information")
+		# 	msg.setWindowTitle("MessageBox demo")
+		# 	msg.setDetailedText("The details are as follows:")	
+		# 	self.pop_up.boutonPartieSave.clicked.connect(self.remplirFeuilleAventure)
 		
 		self.menu.show()
 
+	def departJeu(self, nombreSaves):
+		if nombreSaves == 1:
+			msg = QMessageBox()
+			msg.setIcon(QMessageBox.Warning)
+			msg.setText("Déjà quatre parties sauvegardées.  Veuillez supprimer une partie.  Si vous débutez maintenant, vous ne pourrez pas sauvegarder.")
+			msg.setInformativeText("Voulez-vous vous lancer tout de même à l'aventure?")
+			msg.setWindowTitle("Loup Solitaire")
+			msg.addButton("Revenir au menu", 2)
+			msg.addButton("Débuter la partie", 1)
+			reponse = msg.exec_()
+			if reponse == 1:
+				self.popUpNouvellePartie()
+			else:
+				return
+		#self.popUpNouvellePartie
+		#self.remplirFeuilleAventure
 
 	def popUpNouvellePartie(self):
 		livre = self.pop_up.comboBoxLivre.currentIndex() + 1
@@ -174,6 +201,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 	def remplirFeuilleAventure(self, livre, chapitre, personnage_id):
 
+		self.spinBoxEndurance.valueChanged.connect(self.changerProgressBar)
+		self.spinBoxHabilete.valueChanged.connect(lambda: self.changerSpinBoxHabilete('livre'))
+		self.spinBoxHabileteLivre.valueChanged.connect(self.changerSpinBoxHabilete)
+		self.pushButtonAjouterObjet.clicked.connect(self.ajouterObjetFeuille)
+		self.pushButtonEnleverObjet.clicked.connect(self.enleverObjetFeuille)
+		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))
+		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
+		self.pushQuitter.clicked.connect(sys.exit)
+		self.pushSave.clicked.connect(lambda: self.sauvegarderPartie(livre, chapitre, personnage_id))
+
+
 		self.listeLabelsDisciplines = [
 			'self.labelDiscipline1',
 			'self.labelDiscipline2',
@@ -200,6 +238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.spinBoxBourse.setValue(bourse)
 		self.plainTextEditObjetsSpeciaux.setPlainText(objets_speciaux)
 	
+
 		maitrises = getMaitrises(personnage_id)
 		#https://www.youtube.com/watch?v=bkqjXE_NTbU ->  Jie Jenn "How to iterate child widgets | PyQt6 Tutorial"
 		for x in range(self.layoutDisciplines.count()):
@@ -224,34 +263,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 				self.spinBoxRepas.setValue(value+1)
 			elif inventaireObjets[(objet + 3)] != '': 
 				self.listWidgetInventaire.addItem(inventaireObjets[(objet + 3)])
-		
-		self.changerMaxRepas()
+			self.changerMaxRepas()
 
 		window.show()
-
 		self.partie(livre, chapitre)
+
 
 	def partie(self, livre, chapitre):
 
-		self.spinBoxEndurance.valueChanged.connect(self.changerProgressBar)
-		self.spinBoxHabilete.valueChanged.connect(lambda: self.changerSpinBoxHabilete('livre'))
-		self.spinBoxHabileteLivre.valueChanged.connect(self.changerSpinBoxHabilete)
-		self.pushButtonAjouterObjet.clicked.connect(self.ajouterObjetFeuille)
-		self.pushButtonEnleverObjet.clicked.connect(self.enleverObjetFeuille)
-		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))
-		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
-		self.pushQuitter.clicked.connect(sys.exit)
-	
 		page = getChapitre(livre, chapitre)
-		no_chapitre, texte = page
+		chapitre_id, no_chapitre, texte = page
 		self.textBrowser.setText(texte)
 		self.labelChapitre.setText("Chapitre " + no_chapitre)
+
 
 	def ajouterObjetFeuille(self):
 		totalObjets = self.listWidgetInventaire.count() + self.spinBoxRepas.value()
 		if totalObjets < 8:
 			objet = self.lineEditObjetFeuille.text()
-			if objet.lower() is 'repas':
+			if objet.lower() == 'repas':
 				value = self.spinBoxRepas.value()
 				self.spinBoxRepas.setValue(value+1)
 			elif objet != '':
@@ -267,6 +297,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		value = self.spinBoxEndurance.value()
 		self.progressBarEndurance.setValue(value)
 	
+
 	def changerMaxRepas(self):
 		nombreObjets = self.listWidgetInventaire.count()
 		self.spinBoxRepas.setMaximum(8-nombreObjets)
@@ -278,16 +309,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			value = self.spinBoxHabileteLivre.value()
 			self.spinBoxHabilete.setValue(value)
 	
+
 	def tournerPage(self, livre):
-		
 		pageDestination = self.comboBoxPagesSuivantes.currentText()
 		self.comboBoxPagesSuivantes.clear()
 		tupleLiens = getLiens(pageDestination)
 		for lien in tupleLiens:
 			page_lien = str(lien[1])
 			self.comboBoxPagesSuivantes.addItem(page_lien)
-
 		self.partie(livre, pageDestination)
+	
+	def sauvegarderPartie(self, livre, chapitre, personnage_id):
+		page = getChapitre(livre, chapitre)
+		chapitre_id, livre_id, chapitre = page
+		updateSauvegarde(personnage_id, chapitre_id)
 
 app = QApplication(sys.argv)
 

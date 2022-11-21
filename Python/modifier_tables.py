@@ -161,3 +161,35 @@ def insertInventaireArme(arme_id: int, personnage_id: int):
     finally:
         cursor.close()
         connection.close()
+
+
+def updateSauvegarde(personnage_id: int, chapitre_id: int):
+    """
+    Sauvegarde les informations de la partie
+
+    Args:
+        personnage_id (int): le id du personnage
+        chapitre_id (int): le id du chapitre en cours
+    """
+    query = """
+        UPDATE sauvegarde SET 
+            personnage_id = %(personnage_id)s, 
+            chapitre_id = %(chapitre_id)s, 
+            date_sauvegarde = now()
+        WHERE personnage_id = %(personnage_id)s;
+    """
+    parametres = {
+        'personnage_id' : personnage_id,
+        'chapitre_id' : chapitre_id
+    }
+    try:
+        connection = mysql.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute(query, parametres)
+
+        connection.commit()
+    except mysql.Error as erreur:
+        print(erreur)
+    finally:
+        cursor.close()
+        connection.close()
