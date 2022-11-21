@@ -50,7 +50,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
 		#self.creation.show()
-		self.partie(livre,chapitre, 27)
+		self.remplirFeuilleAventure(livre, chapitre, 1)
 		#self.ouvrirPDF()
 
 		for x in range(8):
@@ -75,7 +75,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.pop_creation.pushButtonAjouterArme.clicked.connect(self.ajouterArme)
 		self.pop_creation.pushButtonEnleverArme.clicked.connect(self.enleverArme)
 
-		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.demarrerNouvellePartie(livre, chapitre, self.dictionnaireNotes))
+		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.enregistrerNouvellePartie(livre, chapitre, self.dictionnaireNotes))
 
 
 	def ajouterArme(self):
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		webbrowser.open_new(path)
 	
 
-	def demarrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
+	def enregistrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
 		self.creation.close()
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
@@ -169,10 +169,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(arme)
 			insertInventaireArme(arme_id, personnage_id)
 		
-		self.partie(livre, chapitre, personnage_id)
+		self.remplirFeuilleAventure(livre, chapitre, personnage_id)
 
 
-	def partie(self, livre, chapitre, personnage_id):
+	def remplirFeuilleAventure(self, livre, chapitre, personnage_id):
 
 		self.listeLabelsDisciplines = [
 			'self.labelDiscipline1',
@@ -187,10 +187,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			'self,labelArme2'
 		]
 
-		page = getChapitre(livre, chapitre)
-		no_chapitre, texte = page
-		self.textBrowser.setText(texte)
-		self.labelChapitre.setText("Chapitre " + no_chapitre)
 
 		personnage = getFeuilleAventure(personnage_id)
 		nom_personnage, habilete, endurance, endurance_max, bourse, objets_speciaux = personnage
@@ -198,10 +194,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.spinBoxHabilete.setValue(habilete)
 		self.spinBoxHabileteLivre.setValue(habilete)
 		self.spinBoxEndurance.setValue(endurance)
+		self.spinBoxEndurance.setMaximum(endurance_max)
 		self.progressBarEndurance.setValue(endurance)
 		self.progressBarEndurance.setMaximum(endurance_max)
 		self.spinBoxBourse.setValue(bourse)
-		self.textBrowserObjetsSpeciaux.setPlainText(objets_speciaux)
+		self.plainTextEditObjetsSpeciaux.setPlainText(objets_speciaux)
 	
 		maitrises = getMaitrises(personnage_id)
 		#https://www.youtube.com/watch?v=bkqjXE_NTbU ->  Jie Jenn "How to iterate child widgets | PyQt6 Tutorial"
@@ -220,19 +217,66 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 
 		inventaireObjets = getInventaire(personnage_id)
-		id, feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 = inventaireObjets
+		id, personnage_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8 = inventaireObjets
 		for objet in range(8):
 			if inventaireObjets[(objet + 3)].lower() == 'repas':
 				value = self.spinBoxRepas.value()
 				self.spinBoxRepas.setValue(value+1)
-			else: 
+			elif inventaireObjets[(objet + 3)] != '': 
 				self.listWidgetInventaire.addItem(inventaireObjets[(objet + 3)])
+		
+		self.changerMaxRepas()
 
 		window.show()
 
+		self.partie(livre, chapitre)
+
+	def partie(self, livre, chapitre):
+
+		self.spinBoxEndurance.valueChanged.connect(self.changerProgressBar)
+		self.spinBoxHabilete.valueChanged.connect(lambda: self.changerSpinBoxHabilete('livre'))
+		self.spinBoxHabileteLivre.valueChanged.connect(self.changerSpinBoxHabilete)
+		self.pushButtonAjouterObjet.clicked.connect(self.ajouterObjetFeuille)
+		self.pushButtonEnleverObjet.clicked.connect(self.enleverObjetFeuille)
 		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))
 		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
 		self.pushQuitter.clicked.connect(sys.exit)
+	
+		page = getChapitre(livre, chapitre)
+		no_chapitre, texte = page
+		self.textBrowser.setText(texte)
+		self.labelChapitre.setText("Chapitre " + no_chapitre)
+
+	def ajouterObjetFeuille(self):
+		totalObjets = self.listWidgetInventaire.count() + self.spinBoxRepas.value()
+		if totalObjets < 8:
+			objet = self.lineEditObjetFeuille.text()
+			if objet.lower() is 'repas':
+				value = self.spinBoxRepas.value()
+				self.spinBoxRepas.setValue(value+1)
+			elif objet != '':
+				self.listWidgetInventaire.addItem(objet)
+			self.changerMaxRepas()
+	def enleverObjetFeuille(self):
+		current = self.listWidgetInventaire.currentRow()
+		self.listWidgetInventaire.takeItem(current)
+		self.changerMaxRepas()
+		
+
+	def changerProgressBar(self):
+		value = self.spinBoxEndurance.value()
+		self.progressBarEndurance.setValue(value)
+	
+	def changerMaxRepas(self):
+		nombreObjets = self.listWidgetInventaire.count()
+		self.spinBoxRepas.setMaximum(8-nombreObjets)
+	def changerSpinBoxHabilete(self, spinBox):
+		if spinBox == 'livre':
+			value = self.spinBoxHabilete.value()
+			self.spinBoxHabileteLivre.setValue(value)
+		else:
+			value = self.spinBoxHabileteLivre.value()
+			self.spinBoxHabilete.setValue(value)
 	
 	def tournerPage(self, livre):
 		

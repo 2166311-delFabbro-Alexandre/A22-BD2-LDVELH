@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1361</width>
-    <height>903</height>
+    <width>1357</width>
+    <height>894</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -380,16 +380,6 @@ p, li { white-space: pre-wrap; }
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QTextBrowser" name="textBrowserObjetsSpeciaux">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>680</y>
-          <width>251</width>
-          <height>91</height>
-         </rect>
-        </property>
-       </widget>
        <widget class="QListWidget" name="listWidgetInventaire">
         <property name="geometry">
          <rect>
@@ -398,6 +388,73 @@ p, li { white-space: pre-wrap; }
           <width>321</width>
           <height>91</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QPlainTextEdit" name="plainTextEditObjetsSpeciaux">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>680</y>
+          <width>261</width>
+          <height>91</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEditObjetFeuille">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>620</y>
+          <width>321</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButtonEnleverObjet">
+        <property name="geometry">
+         <rect>
+          <x>420</x>
+          <y>610</y>
+          <width>181</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Enlever Objet Sélectionné</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButtonAjouterObjet">
+        <property name="geometry">
+         <rect>
+          <x>420</x>
+          <y>630</y>
+          <width>181</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Ajouter objet</string>
         </property>
        </widget>
       </widget>

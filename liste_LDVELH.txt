@@ -3,21 +3,18 @@ LDVELH
 Choses à faire:
 
 -CHECKER GRILLE DE CORRECTION + STICK TO IT
--créer table sauvegarde - done (manque peut-être constraint 4 saves max)
--get toutes infos de la db pour écran principal
--insert toutes infos dans db
--tabs combat et inventaire?
--esthétique:
- -spinbox endurance (max en mortaise?) (couleur?)
- -radio pour pages
- -Edit pour Habilete?
--changer feuille_aventure_id table inventaire
 
--Select aventure:
- -feuille d'aventure
- -liste objet
- -liste maitrises
- -armes
+-lineedit pour sac à dos
+-repas ajoute ou enleve objet
+-enlever textlabel armes
+-trigger 8 objets max - repas
+-setter démarrer partie sauvegardée
+
+
+Sauvegarde:
+-envoyer données puis sauvegarder(personnage_id, inventaire_id, chapitre_id, date!)
+-constraint 4
+-effacer sauvegarde
  
 
 Questions:
@@ -25,4 +22,3 @@ Questions:
 
 Done:
 
--database settée

@@ -54,12 +54,12 @@ def insertPersonnage(nom_personnage: str, habilete: int, endurance: int, enduran
 
     return personnageId
 
-def insertInventaire(feuille_aventure_id: int, nom_personnage:str, objet1: str, objet2: str, objet3: str, objet4: str, objet5: str, objet6: str, objet7: str, objet8: str):
+def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2: str, objet3: str, objet4: str, objet5: str, objet6: str, objet7: str, objet8: str):
     """
     Ajoute un inventaire à la création
 
     Args:
-        feuille_aventure_id (int): id de la feuille d'aventure
+        personnage_id (int): id de la feuille d'aventure
         nom_personnage (str): nom du personnage à qui l'inventaire appartient
         objet1 (str): objet 1
         objet2 (str): objet 2
@@ -74,11 +74,11 @@ def insertInventaire(feuille_aventure_id: int, nom_personnage:str, objet1: str, 
         inventaire_id: le id de l'inventaire créé (int)
     """
     query = """
-        INSERT INTO inventaire (feuille_aventure_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8)
-        VALUES(%(feuille_aventure_id)s, %(nom_personnage)s, %(objet1)s, %(objet2)s, %(objet3)s, %(objet4)s, %(objet5)s, %(objet6)s, %(objet7)s, %(objet8)s);
+        INSERT INTO inventaire (personnage_id, nom_personnage, objet1, objet2, objet3, objet4, objet5, objet6, objet7, objet8)
+        VALUES(%(personnage_id)s, %(nom_personnage)s, %(objet1)s, %(objet2)s, %(objet3)s, %(objet4)s, %(objet5)s, %(objet6)s, %(objet7)s, %(objet8)s);
     """
     parametres = {
-        'feuille_aventure_id' : feuille_aventure_id,
+        'personnage_id' : personnage_id,
         'nom_personnage' : nom_personnage,
         'objet1' : objet1,
         'objet2' : objet2,
