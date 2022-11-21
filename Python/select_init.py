@@ -63,23 +63,21 @@ def getArmes()-> list:
 
 
 #Select les chapitres
-def getChapitre(no_livre: int, no_chapitre: int)-> tuple:
+def getChapitre(chapitre_id: int)-> tuple:
 	"""
 	Sélectionne un chapitre
 	Arguments:
-		no_livre: le numéro du livre (int)
-		no_chapitre: le numéro du chapitre (str)
+		chapitre_id: le id du chapitre (int)
 	Returns:
 		Un tuple avec le id du chapitre, le numéro du chapitre (int) et le texte (text)
 	"""
 	
 	query = """
 		SELECT id, no_chapitre, texte FROM chapitre c
-		WHERE c.livre_id = %(no_livre)s AND c.no_chapitre = %(no_chapitre)s;
+		WHERE c.id = %(chapitre_id)s;
 	"""
 	parametres = {
-		'no_livre' : no_livre,
-		'no_chapitre' : no_chapitre,
+		'chapitre_id' : chapitre_id
 		}
 	try:
 		connection = mysql.connect(**db_config)
@@ -96,21 +94,23 @@ def getChapitre(no_livre: int, no_chapitre: int)-> tuple:
 
 
     #Select les liens entre chapitres
-def getLiens(chapitre: int)-> tuple:
+def getLiens(chapitre_id: int)-> tuple:
 	"""
 	Sélectionne les liens chapitre
 	Arguments:
-		chapitre: le numéro du chapitre (str)
+		chapitre_id: le id du chapitre (int),
+
 	Returns:
 		Un tuple avec le numéro du chapitre d'origine (int) et les destinations (int)
 	"""
 	
 	query = """
-		SELECT no_chapitre_origine, no_chapitre_destination FROM lien_chapitre l
-		WHERE l.no_chapitre_origine = %(chapitre)s;
+		SELECT no_chapitre_origine, no_chapitre_destination FROM lien_chapitre lc
+		INNER JOIN chapitre c ON c.id = %(chapitre_id)s
+		WHERE lc.no_chapitre_origine = c.no_chapitre AND ls.livre_id = c.livre_id;
 	"""
 	parametres = {
-		'chapitre' : chapitre,
+		'chapitre_id' : chapitre_id,
 		}
 	try:
 		connection = mysql.connect(**db_config)
@@ -162,8 +162,8 @@ def getSaves()-> tuple:
 	"""
 	
 	query = """
-		SELECT concat(nom_personnage, " ", date_sauvegarde) FROM feuille_aventure
-        INNER JOIN sauvegarde ON personnage_id = feuille_aventure.id;
+		SELECT s.id, concat(f.nom_personnage, " ", s.date_sauvegarde) FROM feuille_aventure f
+        INNER JOIN sauvegarde s ON s.personnage_id = f.id;
 	"""
 	try:
 		connection = mysql.connect(**db_config)
@@ -178,4 +178,3 @@ def getSaves()-> tuple:
 		
 	return result
 
-#

@@ -142,3 +142,59 @@ def getInventaire(personnage_id: int)-> list:
 		
 	return result
 
+def getSave(sauvegarde_id)-> list:
+	"""
+	Selectionne la partie à charger
+
+	Args:
+		sauvegarde_id (int): le id de la sauvegarde
+	Returns:
+		La sauvegarde
+	"""
+	query = """
+		SELECT personnage_id, chapitre_id from sauvegarde 
+		where id = %(sauvegarde_id)s;
+	"""
+	parametres = {
+		'sauvegarde_id' : sauvegarde_id
+	}
+
+	try:
+		connection = mysql.connect(**db_config)
+		cursor = connection.cursor()
+		cursor.execute(query, parametres)
+		result = cursor.fetchone()
+	except mysql.Error as erreur:
+		print(erreur)
+	finally:
+		cursor.close()
+		connection.close()
+		
+	return result
+
+def getProchainePage(chapitre_id: int, pageDestination: int)-> list:
+	"""
+		Select 
+	"""
+	query = """
+		SELECT chapitre_id from chapitre c
+		INNER JOIN lien_chapitre lc ON lc.chapitre_destination = %(pageDestination)s
+		WHERE c.id = %(chapitre_id)s AND lc.chapitre_origine = c.no_chapitre;
+	"""
+	parametres = {
+		'chapitre_id' : chapitre_id,
+		'pageDestination' : pageDestination
+	}
+
+	try:
+		connection = mysql.connect(**db_config)
+		cursor = connection.cursor()
+		cursor.execute(query, parametres)
+		result = cursor.fetchone()
+	except mysql.Error as erreur:
+		print(erreur)
+	finally:
+		cursor.close()
+		connection.close()
+		
+	return result

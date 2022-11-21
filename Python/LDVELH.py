@@ -9,7 +9,7 @@ from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
 from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde
-from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire
+from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire, getSave
 
 
 from pop_up import Ui_pop_up
@@ -34,25 +34,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		for livre in tuple_livres:
 			self.pop_up.comboBoxLivre.addItem(livre[1])
 		for sauvegarde in tuple_saves:
-			self.pop_up.comboBoxSave.addItems(sauvegarde)
+			self.pop_up.comboBoxSave.addItem(sauvegarde[1],sauvegarde[0])
 		self.pop_up.boutonQuitter.clicked.connect(sys.exit)
 		nombreSaves = self.pop_up.comboBoxSave.count()
+		idPartieChoisie = self.pop_up.comboBoxSave.currentData()
+		list_sauvegarde = getSave(idPartieChoisie)
+		personnage_id, chapitre_id = list_sauvegarde
 		self.pop_up.boutonNouvellePartie.clicked.connect(lambda: self.departJeu(nombreSaves))
-		# if self.pop_up.comboBoxSave.count() < 4:
-		# 	self.pop_up.boutonNouvellePartie.clicked.connect(self.departJeu)
-		# if self.pop_up.comboBoxSave.count() == 4:
-		# 	msg = QMessageBox()
-		# 	msg.setIcon(QMessageBox.Information)
-		# 	msg.setText("This is a message box")
-		# 	msg.setInformativeText("This is additional information")
-		# 	msg.setWindowTitle("MessageBox demo")
-		# 	msg.setDetailedText("The details are as follows:")	
-		# 	self.pop_up.boutonPartieSave.clicked.connect(self.remplirFeuilleAventure)
+		self.pop_up.boutonPartieSave.clicked.connect(lambda: self.remplirFeuilleAventure(chapitre_id, personnage_id))
+
 		
 		self.menu.show()
 
 	def departJeu(self, nombreSaves):
-		if nombreSaves == 1:
+		if nombreSaves == 4:
 			msg = QMessageBox()
 			msg.setIcon(QMessageBox.Warning)
 			msg.setText("Déjà quatre parties sauvegardées.  Veuillez supprimer une partie.  Si vous débutez maintenant, vous ne pourrez pas sauvegarder.")
@@ -65,20 +60,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 				self.popUpNouvellePartie()
 			else:
 				return
-		#self.popUpNouvellePartie
-		#self.remplirFeuilleAventure
+		else:
+			self.popUpNouvellePartie()
+
 
 	def popUpNouvellePartie(self):
 		livre = self.pop_up.comboBoxLivre.currentIndex() + 1
 		chapitre = 'Avertir le roi'
+		chapitre_id = getChapitre(livre, chapitre)
 		self.creation = QtWidgets.QWidget()
 		self.pop_creation = Ui_pop_creation()
 		self.pop_creation.setupUi(self.creation)
-		self.comboBoxPagesSuivantes.addItem('1')
 		self.menu.close()
-		#self.creation.show()
-		self.remplirFeuilleAventure(livre, chapitre, 1)
-		#self.ouvrirPDF()
+		self.creation.show()
+		self.ouvrirPDF()
 
 		for x in range(8):
 			x = None
@@ -102,7 +97,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.pop_creation.pushButtonAjouterArme.clicked.connect(self.ajouterArme)
 		self.pop_creation.pushButtonEnleverArme.clicked.connect(self.enleverArme)
 
-		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.enregistrerNouvellePartie(livre, chapitre, self.dictionnaireNotes))
+		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.enregistrerNouvellePartie(chapitre_id, self.dictionnaireNotes))
 
 
 	def ajouterArme(self):
@@ -171,7 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		webbrowser.open_new(path)
 	
 
-	def enregistrerNouvellePartie(self, livre, chapitre, dictionnaireNotes):
+	def enregistrerNouvellePartie(self, chapitre_id, dictionnaireNotes):
 		self.creation.close()
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
@@ -196,20 +191,26 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(arme)
 			insertInventaireArme(arme_id, personnage_id)
 		
-		self.remplirFeuilleAventure(livre, chapitre, personnage_id)
+		self.remplirFeuilleAventure(chapitre_id, personnage_id)
 
 
-	def remplirFeuilleAventure(self, livre, chapitre, personnage_id):
+	def remplirFeuilleAventure(self, chapitre_id, personnage_id):
+		
+		if chapitre_id == 1:
+			self.comboBoxPagesSuivantes.addItem('1')
+		else
+		page = getChapitre(chapitre_id)
+		chapitre_id, no_chapitre, texte = page
 
 		self.spinBoxEndurance.valueChanged.connect(self.changerProgressBar)
 		self.spinBoxHabilete.valueChanged.connect(lambda: self.changerSpinBoxHabilete('livre'))
 		self.spinBoxHabileteLivre.valueChanged.connect(self.changerSpinBoxHabilete)
 		self.pushButtonAjouterObjet.clicked.connect(self.ajouterObjetFeuille)
 		self.pushButtonEnleverObjet.clicked.connect(self.enleverObjetFeuille)
-		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(livre))
+		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(chapitre_id))
 		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
 		self.pushQuitter.clicked.connect(sys.exit)
-		self.pushSave.clicked.connect(lambda: self.sauvegarderPartie(livre, chapitre, personnage_id))
+		self.pushSave.clicked.connect(lambda: self.sauvegarderPartie(chapitre_id, personnage_id))
 
 
 		self.listeLabelsDisciplines = [
@@ -266,12 +267,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			self.changerMaxRepas()
 
 		window.show()
-		self.partie(livre, chapitre)
+		self.partie(chapitre_id)
 
 
-	def partie(self, livre, chapitre):
+	def partie(self, chapitre_id):
 
-		page = getChapitre(livre, chapitre)
+		page = getChapitre(chapitre_id)
 		chapitre_id, no_chapitre, texte = page
 		self.textBrowser.setText(texte)
 		self.labelChapitre.setText("Chapitre " + no_chapitre)
@@ -310,18 +311,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			self.spinBoxHabilete.setValue(value)
 	
 
-	def tournerPage(self, livre):
+	def tournerPage(self, chapitre_id):
 		pageDestination = self.comboBoxPagesSuivantes.currentText()
 		self.comboBoxPagesSuivantes.clear()
-		tupleLiens = getLiens(pageDestination)
+		tupleLiens = getLiens(chapitre_id, pageDestination)
 		for lien in tupleLiens:
 			page_lien = str(lien[1])
 			self.comboBoxPagesSuivantes.addItem(page_lien)
-		self.partie(livre, pageDestination)
+		self.partie(chapitre_id, pageDestination)
 	
-	def sauvegarderPartie(self, livre, chapitre, personnage_id):
-		page = getChapitre(livre, chapitre)
-		chapitre_id, livre_id, chapitre = page
+	def sauvegarderPartie(self, chapitre_id, personnage_id):
 		updateSauvegarde(personnage_id, chapitre_id)
 
 app = QApplication(sys.argv)
