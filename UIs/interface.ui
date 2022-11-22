@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1357</width>
-    <height>894</height>
+    <width>1349</width>
+    <height>871</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -455,6 +455,55 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>Ajouter objet</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButtonAjouterArme">
+        <property name="geometry">
+         <rect>
+          <x>440</x>
+          <y>450</y>
+          <width>91</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Ajouter</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButtonEnleverArme1">
+        <property name="geometry">
+         <rect>
+          <x>530</x>
+          <y>450</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Enlever Arme1</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboBoxArmesFeuille">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>450</y>
+          <width>321</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButtonEnleverArme2">
+        <property name="geometry">
+         <rect>
+          <x>530</x>
+          <y>466</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Enlever Arme2</string>
         </property>
        </widget>
       </widget>

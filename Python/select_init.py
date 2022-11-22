@@ -69,11 +69,11 @@ def getChapitre(chapitre_id: int)-> tuple:
 	Arguments:
 		chapitre_id: le id du chapitre (int)
 	Returns:
-		Un tuple avec le id du chapitre, le numéro du chapitre (int) et le texte (text)
+		Un tuple avec le id du chapitre, le id du livre (int), le numéro du chapitre (int) et le texte (text)
 	"""
 	
 	query = """
-		SELECT id, no_chapitre, texte FROM chapitre c
+		SELECT id, livre_id, no_chapitre, texte FROM chapitre c
 		WHERE c.id = %(chapitre_id)s;
 	"""
 	parametres = {
@@ -94,23 +94,24 @@ def getChapitre(chapitre_id: int)-> tuple:
 
 
     #Select les liens entre chapitres
-def getLiens(chapitre_id: int)-> tuple:
+def getLiens(livre_id: int, pageDestination: str)-> list:
 	"""
 	Sélectionne les liens chapitre
 	Arguments:
-		chapitre_id: le id du chapitre (int),
-
+		pageOrigine: le numero du chapitre d'origine (str),
+		pageDestination: la page de destination (int)
 	Returns:
-		Un tuple avec le numéro du chapitre d'origine (int) et les destinations (int)
+		Un liste de tuple avec le id du chapitre de la nouvelle page (int) et les prochaines destinations (int)
 	"""
 	
 	query = """
-		SELECT no_chapitre_origine, no_chapitre_destination FROM lien_chapitre lc
-		INNER JOIN chapitre c ON c.id = %(chapitre_id)s
-		WHERE lc.no_chapitre_origine = c.no_chapitre AND ls.livre_id = c.livre_id;
+		SELECT chapitre.id, no_chapitre_destination from lien_chapitre
+		INNER JOIN chapitre ON chapitre.no_chapitre = lien_chapitre.no_chapitre_origine
+		where lien_chapitre.no_chapitre_origine = %(pageDestination)s AND chapitre.livre_id = %(livre_id)s;
 	"""
 	parametres = {
-		'chapitre_id' : chapitre_id,
+		'livre_id' : livre_id,
+		'pageDestination' : pageDestination
 		}
 	try:
 		connection = mysql.connect(**db_config)

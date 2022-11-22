@@ -8,7 +8,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
-from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde
+from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde, updateFeuilleAventure, updateInventaire, updateInventaireArme
 from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire, getSave
 
 
@@ -23,6 +23,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.debuterPartie()
 		self.setupUi(self)
 		self.dictionnaireNotes = {}
+		self.chapitre_id = -1
+		self.dictionnaireArmes = {
+			'Poignard' : 1,
+			'Lance' : 2,
+			'Masse d\'arme' : 3,
+			'Sabre' : 4,
+			'Marteau de guerre' : 5,
+			'Épée' : 6,
+			'Hache' : 7,
+			'Baton' : 8,
+			'Glaive' : 9,
+		}
 
 	#https://www.youtube.com/watch?v=17xE-8UlV_Y (Sajanraj T D)
 	def debuterPartie(self):
@@ -65,9 +77,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 
 	def popUpNouvellePartie(self):
-		livre = self.pop_up.comboBoxLivre.currentIndex() + 1
-		chapitre = 'Avertir le roi'
-		chapitre_id = getChapitre(livre, chapitre)
+		
 		self.creation = QtWidgets.QWidget()
 		self.pop_creation = Ui_pop_creation()
 		self.pop_creation.setupUi(self.creation)
@@ -97,7 +107,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.pop_creation.pushButtonAjouterArme.clicked.connect(self.ajouterArme)
 		self.pop_creation.pushButtonEnleverArme.clicked.connect(self.enleverArme)
 
-		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.enregistrerNouvellePartie(chapitre_id, self.dictionnaireNotes))
+		self.pop_creation.pushButtonDemarrer.clicked.connect(lambda: self.enregistrerNouvellePartie(self.dictionnaireNotes))
 
 
 	def ajouterArme(self):
@@ -166,7 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		webbrowser.open_new(path)
 	
 
-	def enregistrerNouvellePartie(self, chapitre_id, dictionnaireNotes):
+	def enregistrerNouvellePartie(self, dictionnaireNotes):
 		self.creation.close()
 		nom_personnage = self.pop_creation.lineEditNomPersonnage.text()
 		habilete = self.pop_creation.spinBoxHabilete.value()
@@ -191,40 +201,36 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			arme_id = self.pop_creation.comboBoxInventaireArmes.itemData(arme)
 			insertInventaireArme(arme_id, personnage_id)
 		
+		chapitre_id = 1
+		
 		self.remplirFeuilleAventure(chapitre_id, personnage_id)
 
 
 	def remplirFeuilleAventure(self, chapitre_id, personnage_id):
 		
+		
 		if chapitre_id == 1:
-			self.comboBoxPagesSuivantes.addItem('1')
-		else
-		page = getChapitre(chapitre_id)
-		chapitre_id, no_chapitre, texte = page
+			self.partie(chapitre_id)
+			self.comboBoxPagesSuivantes.addItem('1', chapitre_id)
+		else:
+			self.partie(chapitre_id)
+
+		listeArmes = getArmes()
+		for arme in listeArmes:
+			self.comboBoxArmesFeuille.addItem(arme[1], arme[0])
 
 		self.spinBoxEndurance.valueChanged.connect(self.changerProgressBar)
 		self.spinBoxHabilete.valueChanged.connect(lambda: self.changerSpinBoxHabilete('livre'))
 		self.spinBoxHabileteLivre.valueChanged.connect(self.changerSpinBoxHabilete)
 		self.pushButtonAjouterObjet.clicked.connect(self.ajouterObjetFeuille)
 		self.pushButtonEnleverObjet.clicked.connect(self.enleverObjetFeuille)
+		self.pushButtonAjouterArme.clicked.connect(lambda: self.ajouterArmeFeuille(personnage_id))
+		self.pushButtonEnleverArme1.clicked.connect(lambda: self.enleverArmeFeuille1(personnage_id))
+		self.pushButtonEnleverArme2.clicked.connect(lambda: self.enleverArmeFeuille2(personnage_id))
 		self.pushButtonTournerPage.clicked.connect(lambda: self.tournerPage(chapitre_id))
 		self.pushLienPDF.clicked.connect(self.ouvrirPDF)
 		self.pushQuitter.clicked.connect(sys.exit)
-		self.pushSave.clicked.connect(lambda: self.sauvegarderPartie(chapitre_id, personnage_id))
-
-
-		self.listeLabelsDisciplines = [
-			'self.labelDiscipline1',
-			'self.labelDiscipline2',
-			'self.labelDiscipline3',
-			'self.labelDiscipline4',
-			'self.labelDiscipline5',
-		]
-
-		self.listeLabelsArmes =  [
-			'self.labelArme1',
-			'self,labelArme2'
-		]
+		self.pushSave.clicked.connect(lambda: self.sauvegarderPartie(self.chapitre_id, personnage_id))
 
 
 		personnage = getFeuilleAventure(personnage_id)
@@ -238,6 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		self.progressBarEndurance.setMaximum(endurance_max)
 		self.spinBoxBourse.setValue(bourse)
 		self.plainTextEditObjetsSpeciaux.setPlainText(objets_speciaux)
+		
 	
 
 		maitrises = getMaitrises(personnage_id)
@@ -267,15 +274,42 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			self.changerMaxRepas()
 
 		window.show()
-		self.partie(chapitre_id)
+		#self.partie(chapitre_id)
 
 
 	def partie(self, chapitre_id):
 
 		page = getChapitre(chapitre_id)
-		chapitre_id, no_chapitre, texte = page
+		chapitre_id, livre, no_chapitre, texte = page
 		self.textBrowser.setText(texte)
 		self.labelChapitre.setText("Chapitre " + no_chapitre)
+
+		tupleLiens = getLiens(livre, no_chapitre)
+		for lien in tupleLiens:
+			page_lien = str(lien[1])
+			self.comboBoxPagesSuivantes.addItem(page_lien)
+
+
+	def tournerPage(self,chapitre_id)-> int:
+
+		page = getChapitre(chapitre_id)
+		chapitre_id, livre, no_chapitre, texte = page
+		pageDestination = self.comboBoxPagesSuivantes.currentText()
+		self.comboBoxPagesSuivantes.clear()
+		tupleLiens = getLiens(livre, pageDestination)
+		for lien in tupleLiens:
+			page_lien = str(lien[1])
+			self.comboBoxPagesSuivantes.addItem(page_lien)
+		chapitre_id, prochaineDestination = tupleLiens[0]
+
+		page = getChapitre(chapitre_id)
+		chapitre_id, livre, no_chapitre, texte = page
+		self.textBrowser.setText(texte)
+		self.labelChapitre.setText("Chapitre " + no_chapitre)
+
+		self.chapitre_id = chapitre_id
+		#self.partie(chapitre_id)
+		#return chapitre_id
 
 
 	def ajouterObjetFeuille(self):
@@ -292,6 +326,34 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		current = self.listWidgetInventaire.currentRow()
 		self.listWidgetInventaire.takeItem(current)
 		self.changerMaxRepas()
+		totalObjets = self.listWidgetInventaire.count() + self.spinBoxRepas.value()
+		if totalObjets < 8:
+			objet = self.lineEditObjetFeuille.text()
+			if objet.lower() == 'repas':
+				value = self.spinBoxRepas.value()
+				self.spinBoxRepas.setValue(value+1)
+			elif objet != '':
+				self.listWidgetInventaire.addItem(objet)
+			self.changerMaxRepas()
+
+	def ajouterArmeFeuille(self, personnage_id):
+		arme = self.comboBoxArmesFeuille.currentText()
+		for x in range(self.layoutArmes.count()):
+			if self.layoutArmes.itemAt(x).widget().text() == '':
+				self.layoutArmes.itemAt(x).widget().setText(arme)
+				arme_id = self.dictionnaireArmes[arme]
+				insertInventaireArme(arme_id, personnage_id)
+				return
+	def enleverArmeFeuille1(self, personnage_id):
+		arme = self.layoutArmes.itemAt(0).widget().text()
+		self.layoutArmes.itemAt(0).widget().setText("")
+		arme_id = self.dictionnaireArmes[arme]
+		updateInventaireArme(personnage_id, arme_id)
+	def enleverArmeFeuille2(self, personnage_id):
+		arme = self.layoutArmes.itemAt(1).widget().text()
+		self.layoutArmes.itemAt(1).widget().setText("")
+		arme_id = self.dictionnaireArmes[arme]
+		updateInventaireArme(personnage_id, arme_id)
 		
 
 	def changerProgressBar(self):
@@ -310,17 +372,28 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			value = self.spinBoxHabileteLivre.value()
 			self.spinBoxHabilete.setValue(value)
 	
-
-	def tournerPage(self, chapitre_id):
-		pageDestination = self.comboBoxPagesSuivantes.currentText()
-		self.comboBoxPagesSuivantes.clear()
-		tupleLiens = getLiens(chapitre_id, pageDestination)
-		for lien in tupleLiens:
-			page_lien = str(lien[1])
-			self.comboBoxPagesSuivantes.addItem(page_lien)
-		self.partie(chapitre_id, pageDestination)
 	
 	def sauvegarderPartie(self, chapitre_id, personnage_id):
+
+		habilete = self.spinBoxHabilete.value()
+		endurance = self.spinBoxEndurance.value()
+		bourse = self.spinBoxBourse.value()
+		objets_speciaux = self.plainTextEditObjetsSpeciaux.toPlainText()
+		updateFeuilleAventure(personnage_id, habilete, endurance, bourse, objets_speciaux)
+
+		objet = {}
+		nombreObjets = self.listWidgetInventaire.count()
+		nombreRepas = self.spinBoxRepas.value()
+		for x in range(nombreObjets):
+			objet[x] = self.listWidgetInventaire.item(x).text()
+		for x in range(nombreRepas):
+			objet[x+nombreObjets] = 'Repas'
+		updateInventaire(personnage_id, objet[1], objet[2], objet[3], objet[4], objet[5], objet[6], objet[7], objet[8])
+
+		# for x in range(self.layoutArmes.count()):
+		# 	arme_nom = self.layoutArmes.itemAt(x).widget().text()
+
+
 		updateSauvegarde(personnage_id, chapitre_id)
 
 app = QApplication(sys.argv)
