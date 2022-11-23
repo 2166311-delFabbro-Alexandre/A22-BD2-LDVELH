@@ -52,7 +52,7 @@ create table if not exists ldvelh.inventaire (
 	objet7 varchar(20),
 	objet8 varchar(20),
 	CONSTRAINT inventaire_pk PRIMARY KEY (id),
-	CONSTRAINT inventaire_fk FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id)
+	CONSTRAINT inventaire_fk FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE
 );
 
 create table if not exists ldvelh.discipline_kai (
@@ -69,7 +69,7 @@ create table if not exists ldvelh.maitrise_kai (
 	notes text,
 	CONSTRAINT maitrise_kai_pk PRIMARY KEY (id),
 	CONSTRAINT maitrise_kai_FK FOREIGN KEY (discipline_id) REFERENCES ldvelh.discipline_kai(id),
-	CONSTRAINT maitrise_kai_FK2  FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id)
+	CONSTRAINT maitrise_kai_FK2  FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE
 );
 
 create table if not exists ldvelh.arme (
@@ -84,7 +84,7 @@ create table if not exists ldvelh.inventaire_arme (
 	personnage_id INT NOT NULL,
 	CONSTRAINT inventaire_arme_pk PRIMARY KEY (id),
 	CONSTRAINT inventaire_arme_FK FOREIGN KEY (arme_id) REFERENCES ldvelh.arme(id),
-	CONSTRAINT inventaire_arme_FK2 FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id)
+	CONSTRAINT inventaire_arme_FK2 FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE
 );
 
 create table if not exists ldvelh.sauvegarde (
@@ -93,6 +93,6 @@ create table if not exists ldvelh.sauvegarde (
 	chapitre_id INT NOT NULL,
 	date_sauvegarde DATETIME NOT NULL,
 	CONSTRAINT sauvegarde_pk PRIMARY KEY (id),
-	CONSTRAINT sauvegarde_FK FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id),
+	CONSTRAINT sauvegarde_FK FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE, 
 	CONSTRAINT sauvegarde_FK2 FOREIGN KEY (chapitre_id) REFERENCES ldvelh.chapitre(id)
 );

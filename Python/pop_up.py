@@ -36,6 +36,10 @@ class Ui_pop_up(object):
         self.boutonQuitter = QtWidgets.QPushButton(pop_up)
         self.boutonQuitter.setGeometry(QtCore.QRect(240, 280, 271, 41))
         self.boutonQuitter.setObjectName("boutonQuitter")
+        self.boutonPartieSupprimer = QtWidgets.QPushButton(pop_up)
+        self.boutonPartieSupprimer.setEnabled(False)
+        self.boutonPartieSupprimer.setGeometry(QtCore.QRect(40, 200, 201, 31))
+        self.boutonPartieSupprimer.setObjectName("boutonPartieSupprimer")
 
         self.retranslateUi(pop_up)
         QtCore.QMetaObject.connectSlotsByName(pop_up)
@@ -47,3 +51,4 @@ class Ui_pop_up(object):
         self.labelBienvenu.setText(_translate("pop_up", "Bienvenu loup solitaire"))
         self.boutonPartieSave.setText(_translate("pop_up", "Partie Sauvegardée"))
         self.boutonQuitter.setText(_translate("pop_up", "Quitter"))
+        self.boutonPartieSupprimer.setText(_translate("pop_up", "Supprimer partie"))

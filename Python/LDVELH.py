@@ -8,7 +8,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from select_init import getLivres, getSaves, getChapitre, getArmes, getDisciplines, getLiens
-from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde, updateFeuilleAventure, updateInventaire, updateInventaireArme
+from modifier_tables import insertInventaire, insertPersonnage, insertMaitrise, insertInventaireArme, updateSauvegarde, createSauvegarde, updateFeuilleAventure, updateInventaire, updateInventaireArme, supprimerSauvegarde
 from select_aventure import getFeuilleAventure, getInventaireArmes, getMaitrises, getInventaire, getSave
 
 
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 			'Baton' : 8,
 			'Glaive' : 9,
 		}
+		self.nouveauPersonnage = 0
 
 	#https://www.youtube.com/watch?v=17xE-8UlV_Y (Sajanraj T D)
 	def debuterPartie(self):
@@ -45,18 +46,30 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		tuple_saves = getSaves()
 		for livre in tuple_livres:
 			self.pop_up.comboBoxLivre.addItem(livre[1])
+			self.pop_up.boutonPartieSave.setDisabled(True)
 		for sauvegarde in tuple_saves:
 			self.pop_up.comboBoxSave.addItem(sauvegarde[1],sauvegarde[0])
+			if self.pop_up.comboBoxSave.count() > 0:
+				self.pop_up.boutonPartieSupprimer.setEnabled(True)
 		self.pop_up.boutonQuitter.clicked.connect(sys.exit)
 		nombreSaves = self.pop_up.comboBoxSave.count()
 		idPartieChoisie = self.pop_up.comboBoxSave.currentData()
 		list_sauvegarde = getSave(idPartieChoisie)
-		personnage_id, chapitre_id = list_sauvegarde
+		if list_sauvegarde:
+			personnage_id, chapitre_id = list_sauvegarde
+			self.pop_up.boutonPartieSave.setEnabled(True)
 		self.pop_up.boutonNouvellePartie.clicked.connect(lambda: self.departJeu(nombreSaves))
 		self.pop_up.boutonPartieSave.clicked.connect(lambda: self.remplirFeuilleAventure(chapitre_id, personnage_id))
+		self.pop_up.boutonPartieSupprimer.clicked.connect(lambda: self.supprimerPartie(personnage_id))
 
-		
 		self.menu.show()
+
+	def supprimerPartie(self, personnage_id):
+		supprimerSauvegarde(personnage_id)
+		index = self.pop_up.comboBoxSave.currentIndex()
+		self.pop_up.comboBoxSave.removeItem(index)
+
+
 
 	def departJeu(self, nombreSaves):
 		if nombreSaves == 4:
@@ -78,6 +91,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 
 	def popUpNouvellePartie(self):
 		
+		self.nouveauPersonnage = 1
 		self.creation = QtWidgets.QWidget()
 		self.pop_creation = Ui_pop_creation()
 		self.pop_creation.setupUi(self.creation)
@@ -326,15 +340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		current = self.listWidgetInventaire.currentRow()
 		self.listWidgetInventaire.takeItem(current)
 		self.changerMaxRepas()
-		totalObjets = self.listWidgetInventaire.count() + self.spinBoxRepas.value()
-		if totalObjets < 8:
-			objet = self.lineEditObjetFeuille.text()
-			if objet.lower() == 'repas':
-				value = self.spinBoxRepas.value()
-				self.spinBoxRepas.setValue(value+1)
-			elif objet != '':
-				self.listWidgetInventaire.addItem(objet)
-			self.changerMaxRepas()
+
 
 	def ajouterArmeFeuille(self, personnage_id):
 		arme = self.comboBoxArmesFeuille.currentText()
@@ -384,17 +390,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_pop_up, Ui_pop_creation):
 		objet = {}
 		nombreObjets = self.listWidgetInventaire.count()
 		nombreRepas = self.spinBoxRepas.value()
+		totalObjets = nombreObjets + nombreRepas
 		for x in range(nombreObjets):
 			objet[x] = self.listWidgetInventaire.item(x).text()
 		for x in range(nombreRepas):
 			objet[x+nombreObjets] = 'Repas'
-		updateInventaire(personnage_id, objet[1], objet[2], objet[3], objet[4], objet[5], objet[6], objet[7], objet[8])
-
-		# for x in range(self.layoutArmes.count()):
-		# 	arme_nom = self.layoutArmes.itemAt(x).widget().text()
-
-
-		updateSauvegarde(personnage_id, chapitre_id)
+		for x in range (8 - totalObjets):
+			objet[x+totalObjets] = ''
+		updateInventaire(personnage_id, objet[0], objet[1], objet[2], objet[3], objet[4], objet[5], objet[6], objet[7])
+		if self.nouveauPersonnage == 0:
+			updateSauvegarde(personnage_id, chapitre_id)
+		else:
+			createSauvegarde(personnage_id, chapitre_id)
 
 app = QApplication(sys.argv)
 

@@ -94,7 +94,6 @@ def insertInventaire(personnage_id: int, nom_personnage:str, objet1: str, objet2
         connection = mysql.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(query, parametres)
-        inventaireId = cursor.lastrowid
 
         connection.commit()
     except mysql.Error as erreur:
@@ -178,9 +177,9 @@ def updateFeuilleAventure(personnage_id: int, habilete: int, endurance: int, bou
     """
     query = """
         UPDATE feuille_aventure SET
-            habilete = %(habilete)s
-            endurance = %(endurance)s
-            bourse = %(bourse)s
+            habilete = %(habilete)s,
+            endurance = %(endurance)s,
+            bourse = %(bourse)s,
             objets_speciaux = %(objets_speciaux)s
         WHERE id = %(personnage_id)s
     """
@@ -246,7 +245,6 @@ def updateInventaire(personnage_id: int, objet1: str, objet2: str, objet3: str, 
         connection = mysql.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(query, parametres)
-        inventaireId = cursor.lastrowid
 
         connection.commit()
     except mysql.Error as erreur:
@@ -286,6 +284,35 @@ def updateInventaireArme(personnage_id: int, arme_id: str):
         connection.close()
 
 
+def createSauvegarde(personnage_id: int, chapitre_id: int):
+    """
+    Sauvegarde les informations d'une nouvelle partie
+
+    Args:
+        personnage_id (int): le id du personnage
+        chapitre_id (int): le id du chapitre en cours
+    """
+    query = """
+        INSERT INTO sauvegarde (personnage_id, chapitre_id, date_sauvegarde)
+        VALUES(%(personnage_id)s, %(chapitre_id)s, now());
+    """
+    parametres = {
+        'personnage_id' : personnage_id,
+        'chapitre_id' : chapitre_id
+    }
+    try:
+        connection = mysql.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute(query, parametres)
+
+        connection.commit()
+    except mysql.Error as erreur:
+        print(erreur)
+    finally:
+        cursor.close()
+        connection.close()
+
+
 def updateSauvegarde(personnage_id: int, chapitre_id: int):
     """
     Sauvegarde les informations de la partie
@@ -304,6 +331,33 @@ def updateSauvegarde(personnage_id: int, chapitre_id: int):
     parametres = {
         'personnage_id' : personnage_id,
         'chapitre_id' : chapitre_id
+    }
+    try:
+        connection = mysql.connect(**db_config)
+        cursor = connection.cursor()
+        cursor.execute(query, parametres)
+
+        connection.commit()
+    except mysql.Error as erreur:
+        print(erreur)
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def supprimerSauvegarde(id: int):
+    """
+    Supprime une sauvegarde de la bd
+
+    Args:
+        id (int): id du personnage
+    """
+    query = """
+        DELETE FROM feuille_aventure
+            WHERE id = %(id)s
+    """
+    parametres = {
+        'id' : id
     }
     try:
         connection = mysql.connect(**db_config)
