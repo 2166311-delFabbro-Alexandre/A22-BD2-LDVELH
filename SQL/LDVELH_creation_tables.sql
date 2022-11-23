@@ -87,6 +87,13 @@ create table if not exists ldvelh.inventaire_arme (
 	CONSTRAINT inventaire_arme_FK2 FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE
 );
 
+CREATE TRIGGER before_insert_sauvegarde
+    BEFORE INSERT
+	ON sauvegarde FOR EACH ROW
+    BEGIN
+		if new.chapitre_id == old. chapitre_id
+		;
+	
 create table if not exists ldvelh.sauvegarde (
 	id INT auto_increment NOT NULL,
 	personnage_id INT NOT NULL,
@@ -96,3 +103,52 @@ create table if not exists ldvelh.sauvegarde (
 	CONSTRAINT sauvegarde_FK FOREIGN KEY (personnage_id) REFERENCES ldvelh.feuille_aventure(id) ON DELETE CASCADE, 
 	CONSTRAINT sauvegarde_FK2 FOREIGN KEY (chapitre_id) REFERENCES ldvelh.chapitre(id)
 );
+
+DELIMITER $$
+
+CREATE PROCEDURE VoirAventuriers()
+BEGIN
+    SELECT 
+        f.nom_personnage,
+		f.habilete,
+        f.endurance_max, 
+        f.bourse, 
+        f.objets_speciaux, 
+        i.objet1,
+		i.objet2,
+		i.objet3,
+		i.objet4,
+		i.objet5,
+		i.objet6,
+		i.objet7,
+		i.objet8,
+    FROM feuille_aventure f
+	INNER JOIN inventaire i ON feuille_aventure.id = inventaire.personnage_id;
+    
+END$$
+
+DELIMITER ;
+
+https://stackoverflow.com/questions/2538786/how-to-abort-insert-operation-in-mysql-trigger
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_feuille_aventure
+BEFORE INSERT
+ON feuille_aventure FOR EACH ROW
+BEGIN
+    DECLARE nombreSauvegardes INT;
+    DECLARE message VARCHAR(255);
+	
+    SELECT COUNT(*) 
+    INTO nombreSauvegardes
+    FROM feuille_aventure;
+    
+    IF nombreSauvegardes > 3 THEN
+        SET message = "Ooh non pas plus de 4 Loups Solitaires!"
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = message;
+    END IF; 
+
+END $$
+
+DELIMITER ;
